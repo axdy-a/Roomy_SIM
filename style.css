@@ -1,0 +1,45 @@
+body{
+    margin:0;
+    font-family: Inter;
+
+}
+#sim-logo{
+    display: inline;
+    width: 120px;
+}
+#nav {
+    display: block;
+    width: 100%;
+    margin: 0;
+    height: auto;
+    background-color: white;
+    box-shadow: 0 6px 6px rgba(0, 0, 0, .1);
+}
+.nav-menu{
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    width: 100%;
+    padding:0;
+    padding-top: 0.5%;
+    padding-bottom: 0.5%;
+    margin: 0;
+}
+.nav-item{
+    display: inline;
+    padding-left: 40px;
+    padding-right: 40px;
+    color: black;
+    font-size: small;
+    font-weight: bolder;
+}
+.nav-btn{
+    text-decoration: none;
+}
+.nav-btn:link, .nav-btn:visited{
+    color: black;
+    text-decoration: none;
+}
+.nav-btn:hover{
+    color: blue;
+}
