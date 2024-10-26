@@ -1,12 +1,12 @@
-.login-container{
+.login-container, .register-container{
     display:flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
 }
-.login-box{
+.login-box,.register-box{
     width: 500px;
-    height: 500px;
+    height: 300px;
     box-shadow: 0 6px 6px rgba(0, 0, 0, .1);
     padding: 30px
 }
@@ -17,12 +17,11 @@
     padding: 2%;
 }
 .info-field{
-    width: 100px;
+    width: 25%;
 }
 
-input[type=button],
-input[type=submit],button {
-  background-color: #62529c;
+button {
+  background-color: #3f8fe6;
   border: none;
   color: #fff;
   padding: 15px 30px;
