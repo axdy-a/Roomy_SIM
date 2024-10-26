@@ -1,0 +1,32 @@
+.login-container{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.login-box{
+    width: 500px;
+    height: 500px;
+    box-shadow: 0 6px 6px rgba(0, 0, 0, .1);
+    padding: 30px
+}
+.row-form{
+    display: flex;
+    column-gap: 10%;
+    justify-content: center;
+    padding: 2%;
+}
+.info-field{
+    width: 100px;
+}
+
+input[type=button],
+input[type=submit],button {
+  background-color: #62529c;
+  border: none;
+  color: #fff;
+  padding: 15px 30px;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
+}

@@ -43,3 +43,11 @@ body{
 .nav-btn:hover{
     color: blue;
 }
+.background-img{
+    width: auto;
+    height: 700px;
+}
+.background-img-container{
+    display: flex;
+    justify-content: center;
+}
