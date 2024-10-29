@@ -1,25 +1,26 @@
 class User {
-    constructor(name, email) {
-      this.name = name;
-      this.email = email;
+    constructor(name, email, pw) {
+      this.name = name
+      this.email = email
+      this.password = pw
     }
     getName(){
         return this.name
     }
   
-    login(){
-
+    getEmail(){
+        return this.email
     }
     
-    register(){
-
+    getPassword(){
+        return this.password
     }
   }
   
   // Subclass Student extending User
   class Student extends User {
-    constructor(name, email, studentID) {
-      super(name, email); // Calls the constructor of the User class
+    constructor(name, email, password, studentID) {
+      super(name, email, password); // Calls the constructor of the User class
       this.studentID = studentID;
     }
   
@@ -27,8 +28,8 @@ class User {
   
   // Subclass Staff extending User
   class Staff extends User {
-    constructor(name, email, staffID) {
-      super(name, email); // Calls the constructor of the User class
+    constructor(name, email, password, staffID) {
+      super(name, email, password); // Calls the constructor of the User class
       this.staffID = staffID;
     }
   
@@ -75,4 +76,19 @@ class Booking {
         return price;
     }
     
+}
+
+
+const staff_acc = new Staff("John", "johndoe@gmail.com", "uowstaffpassword", "13259123")
+const student_acc = new Student("Chris","chris@uow.edu.au", "uowstudentpassword", "78517231")
+
+function login(){
+    const email = document.querySelector('input[title="email"]').value
+
+    const password = document.querySelector('input[title="password"]').value
+
+    if (email == student_acc.getEmail() && password == student_acc.getPassword()){
+        console.log("success")
+        window.location.href = 'index.html';
+    }
 }
