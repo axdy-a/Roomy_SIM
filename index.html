@@ -13,11 +13,13 @@
                 <li class="nav-item"><img id="sim-logo" src="resources/logo-secondary.png" alt="logo"></li>
                 <li class="nav-item onlogin"><a class="nav-btn" href=.booking-container>Book a Room</a></li>
                 <li class="nav-item onlogin"><a class="nav-btn" href="#bookings">Bookings</a></li>
-                <li class="nav-item"><a class="nav-btn" href="#" onclick="openLogin()">Login</a></li>
+                <li class="nav-item offlogin"><a class="nav-btn" href="index.html" onclick="openLogin()">Login</a></li>
+                <li class="nav-item onlogin"><a class="nav-btn" href="javascript:void(0);" onclick="openLogin()">Logout</a></li>
             </ul>
         </div>
         <div id="booking-container">
             <h1>Book a Room</h1>
+            <p>Note that bookings are strictly for students that are in Campus. Please arrive at the room within 10 minutes or the room will be forfieted.</p>
             <div id="room-container"></div>
         </div>
         <div id="login-container">
@@ -30,15 +32,12 @@
                 <div class="row-form">
                     <span class="info-field">Password :</span>
                     <input class="login-input" title="password" type="password">
+                </div>  
+                <div class="row-form">
+                    <button type="button" onclick="login()">Login</button>
                 </div>
                 <div class="row-form">
-                    <a href="">Not a student?</a>
-                </div>
-                <div class="row-form">
-                    <button onclick="login()">Login</button>
-                </div>
-                <div class="row-form">
-                    <a href="#" onclick="openRegister()">New user? Register here</a>
+                    <a href="javascript:void(0);" onclick="openRegister()">New user? Register here</a>
                 </div>
                 <div class="row-form" id="error"></div>
             </div>
@@ -64,7 +63,7 @@
                         <input class="login-input" title="password" type="password" id="reg-cfmpw">
                     </div>
                     <div class="row-form">
-                        <button onclick="register()">Register</button>
+                        <button type="button" onclick="register()">Register</button>
                     </div>
                     <div class="row-form" id="reg_error"></div>
                 </form>

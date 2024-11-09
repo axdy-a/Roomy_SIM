@@ -18,9 +18,13 @@ class User {
   }
   
   // Subclass Student extending User
-  class Student extends User {
+class Student extends User {
     constructor(name, email, password) {
-      super(name, email, password); // Calls the constructor of the User class
+        super(name, email, password); // Calls the constructor of the User class
+        this.login_status = false
+    }
+    login(){
+        this.login_status = true
     }
   
   }
@@ -34,8 +38,9 @@ class User {
 }
 
 class Room {
-    constructor(room_name, timeslots, price, capacity, launch_status=false, promo_codes=[]){
+    constructor(room_name, building, timeslots, price, capacity, launch_status=false, promo_codes=[]){
         this.room_name = room_name
+        this.building = building
         this.slots = timeslots
         this.launch_status = launch_status
         this.price = price
@@ -61,6 +66,14 @@ class Room {
 
     getLaunch(){
         return this.launch_status
+    }
+
+    getTimeslots(){
+        return this.slots
+    }
+
+    getBuilding(){
+        return this.building
     }
 }
 
@@ -90,36 +103,71 @@ const staff_acc = new Staff("John", "admin@uow.edu.au", "Staff!")
 const student_acc = new Student("Chris","chris@uow.edu.au", "Uowstudent!")
 var account_list = [staff_acc, student_acc]
 
+const nav_onlogin = document.getElementsByClassName('onlogin')
+const nav_offlogin = document.getElementsByClassName('offlogin')
+
 function openLogin(){
     login_section.style.display = 'flex'
     booking_section.style.display = 'none'
     reg_section.style.display = 'none'
+    login_status = document.querySelector(".far-right")
+    login_status.textContent = ""
 }
 
 function openBooking(){
     login_section.style.display = 'none'
     reg_section.style.display = 'none'
     booking_section.style.display = 'flex'
+
+    Array.from(nav_onlogin).forEach((nav) => {
+        nav.style.display = 'inline'
+    })
+
+    Array.from(nav_offlogin).forEach((nav) => {
+        nav.style.display = 'none'
+    })
 }
 
 function login(){
     const email = document.querySelector('input[title="email"]').value.trim()
     const password = document.querySelector('input[title="password"]').value.trim()
+    var status = 0
 
-    if (account_list.some(acc => acc.getEmail() == email && acc.getPassword() == password && acc instanceof Student)){
-        console.log("success")
-        openBooking()
+    for (i=0;i<account_list.length;i++){
+        if (account_list[i].getEmail() == email && account_list[i].getPassword() == password && account_list[i] instanceof Student){
+            console.log("success")
+            status = 1
+            account_list[i].login()
+            loginDisplay(account_list[i])
+            openBooking()
+        }
+        else if (account_list[i].getEmail() == email && account_list[i].getPassword() == password && account_list[i] instanceof Staff){
+            /* Staff */
+            status = 1
+            console.log("staff")
+        }
     }
-    else if (account_list.some(acc => acc.getEmail() == email && acc.getPassword() == password && acc instanceof Staff)){
-        /* Staff */
-        console.log("staff")
-    }
-
-    else {
+    if (status == 0) {
         msgBox = document.getElementById('error')
         msgBox.innerText = "Incorrect Email or Password !"
+    }  
+}
+
+function loginDisplay(acc){
+    const element = document.querySelector(".far-right")
+    if (!element) {
+        container = document.querySelector("ul[class='nav-menu']")
+        newLi = document.createElement('li')
+        newLi.classList.add('nav-item')
+        newLi.classList.add('far-right')
+        newLi.textContent = `Logged in as ${acc.getName()}`
+        container.appendChild(newLi)
+    } 
+    else {
+        element.textContent = `Logged in as ${acc.getName()}`
     }
 }
+
 
 function openRegister(){
     reg_section.style.display = 'flex'
@@ -148,9 +196,9 @@ function register(){
             if (emailRegex.test(reg_email) == true) {
                 /* create acc */
                 account_list.push(new Student(reg_name,reg_email,reg_cfmpassword))
-                reg_section.style.display = 'none'
-                booking_section.style.display = 'flex'
-                console.log(account_list)
+                account_list[account_list.length - 1].login()
+                loginDisplay(account_list[account_list.length - 1])
+                openBooking()
             }
             else {
                 msgBox = document.getElementById('reg_error')
@@ -170,27 +218,27 @@ function register(){
 }
 
 default_timeslots = [
-                    "0800 - 0900",
-                    "0900 - 1000",
-                    "1000 - 1100",
-                    "1100 - 1200",
-                    "1200 - 1300",
-                    "1300 - 1400",
-                    "1400 - 1500",
-                    "1500 - 1600",
-                    "1600 - 1700",
-                    "1700 - 1800"
+                    "8:00 AM<br>9:00 AM",
+                    "9:00 AM<br>10:00 AM",
+                    "10:00 AM<br>11:00 AM",
+                    "11:00 AM<br>12:00 PM",
+                    "12:00 PM<br>1:00 PM",
+                    "1:00 PM<br>2:00 PM",
+                    "2:00 PM<br>3:00 PM",
+                    "3:00 PM<br>4:00 PM",
+                    "4:00 PM<br>5:00 PM",
+                    "5:00 PM<br>6:00 PM"
                 ]
 
 rooms = [
-    new Room("A-L2-101", default_timeslots, 2, 4, true, promo_codes=["10OFF"]),
-    new Room("A-L2-102", default_timeslots, 2, 4, true, promo_codes=["10OFF"]),
-    new Room("A-L2-103", default_timeslots, 2, 4, true, promo_codes=["10OFF"]),
-    new Room("A-L2-104", default_timeslots, 2, 4, true, promo_codes=["10OFF"]),
-    new Room("B-L3-211", default_timeslots, 2, 6, true, promo_codes=["10OFF"]),
-    new Room("B-L3-212", default_timeslots, 2, 6, true, promo_codes=["10OFF"]),
-    new Room("B-L3-213", default_timeslots, 2, 8, true, promo_codes=["10OFF"]),
-    new Room("B-L3-214", default_timeslots, 2, 8, true, promo_codes=["10OFF"])
+    new Room("A-L2-101", "SIM Campus - Block A", default_timeslots, 2, 4, true, promo_codes=["10OFF"]),
+    new Room("A-L2-102", "SIM Campus - Block A", default_timeslots, 2, 4, true, promo_codes=["10OFF"]),
+    new Room("A-L2-103", "SIM Campus - Block A", default_timeslots, 2, 4, true, promo_codes=["10OFF"]),
+    new Room("A-L2-104", "SIM Campus - Block A", default_timeslots, 2, 4, true, promo_codes=["10OFF"]),
+    new Room("B-L3-211", "SIM Campus - Block B", default_timeslots, 2, 6, true, promo_codes=["10OFF"]),
+    new Room("B-L3-212", "SIM Campus - Block B", default_timeslots, 2, 6, true, promo_codes=["10OFF"]),
+    new Room("B-L3-213", "SIM Campus - Block B", default_timeslots, 2, 8, true, promo_codes=["10OFF"]),
+    new Room("B-L3-214", "SIM Campus - Block B", default_timeslots, 2, 8, true, promo_codes=["10OFF"])
 ]
 
 
@@ -227,10 +275,41 @@ function generateRooms() {
     rooms.forEach((room) => {
         // Make sure room.getLaunch is a boolean or a method that returns true/false
         if (room.getLaunch() == true) {
-            const newDiv = document.createElement('div');
-            newDiv.textContent = room.getRoomname();  // Ensure this is a valid method/property
+            const newDiv = document.createElement('div')
+            const roomNameContainer = document.createElement('div')
+            const roomBuilding = document.createElement('span')
+            const roomName = document.createElement('span')
+
+            roomNameContainer.id = "room-info"
+            roomNameContainer.innerHTML = `<img class='meeting-icon' alt='room' src='resources/meeting_room.svg'></img>`
+            roomBuilding.innerHTML = `${room.getBuilding()}`
+            roomName.innerHTML = `Room No: ${room.getRoomname()}`
+            roomName.setAttribute('style','font-size:small;')
             newDiv.classList.add('room');
+
             container.appendChild(newDiv);
+            newDiv.appendChild(roomNameContainer)
+            roomNameContainer.appendChild(roomBuilding)
+            roomNameContainer.appendChild(roomName)
+
+            newBtncontainer = document.createElement('div')
+            newBtncontainer.classList.add('button-container')
+            newDiv.appendChild(newBtncontainer)
+            
+            timeslots = room.getTimeslots()
+
+            timeslots.forEach((slot) => {
+                btn = document.createElement('button')
+                btn.classList.add('slotbtn')
+                btn.innerHTML = slot
+                newBtncontainer.appendChild(btn)
+            })
+
+            
+
+
+
+
         } else {
             console.log('Room is not launched, skipping...');  // Debugging log
         }

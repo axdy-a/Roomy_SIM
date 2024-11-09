@@ -8,7 +8,7 @@ body{
 
 #sim-logo{
     display: inline;
-    width: 120px;
+    width: 140px;
 }
 #nav {
     display: block;
@@ -30,8 +30,8 @@ body{
 }
 .nav-item{
     display: inline;
-    padding-left: 40px;
-    padding-right: 40px;
+    padding-left: 30px;
+    padding-right: 30px;
     color: black;
     font-size: small;
     font-weight: bolder;
@@ -49,7 +49,9 @@ body{
 .onlogin {
     display: none;
 }
-
+.far-right {
+    margin-left:auto;
+}
 
 
 
@@ -61,16 +63,45 @@ body{
     flex-direction: column;
     align-items: center;
 }
+
 .room{
-    width: 800px;
+    width: 900px;
     height: 10ch;
     box-shadow: 0 6px 6px rgba(0, 0, 0, .1);
     padding: 3ch;
     margin: 3ch;
     display: flex;
 }
+.meeting-icon{
+    padding: 0px 2px 2px 0px;
+}
+#room-info{
+    display: flex;
+    width: 30%;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    height: 80%;
+}
+
 .building-container{
     width: 80%
+}
+.button-container{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+.slotbtn {
+    width: 19%;
+    background-color: rgb(206, 206, 206);
+    border-radius: 12px;
+    padding: 12px 12px;
+    color: black;
+    font-weight: 400;
+    font-family: Inter;
 }
 
 /* Login */
@@ -95,6 +126,7 @@ body{
 .info-field{
     width: 25%;
 }
+
 
 button {
   background-color: #3f8fe6;
