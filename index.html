@@ -10,16 +10,64 @@
     <body>
         <div id="nav">
             <ul class="nav-menu">
-                <li class="nav-item"><img id="sim-logo" src="resources/sim-ge-primary-logo.svg" alt="logo"></li>
-                <li class="nav-item"><a class="nav-btn" href="index.html">Book a Room</a></li>
-                <li class="nav-item"><a class="nav-btn" href="#bookings">Bookings</a></li>
-                <li class="nav-item"><a class="nav-btn" href="login.html">Login</a></li>
+                <li class="nav-item"><img id="sim-logo" src="resources/logo-secondary.png" alt="logo"></li>
+                <li class="nav-item onlogin"><a class="nav-btn" href=.booking-container>Book a Room</a></li>
+                <li class="nav-item onlogin"><a class="nav-btn" href="#bookings">Bookings</a></li>
+                <li class="nav-item"><a class="nav-btn" href="#" onclick="openLogin()">Login</a></li>
             </ul>
         </div>
-        <div class="content">
+        <div id="booking-container">
             <h1>Book a Room</h1>
-            <div class="building-container">
-                <div class="room-container">test</div>
+            <div id="room-container"></div>
+        </div>
+        <div id="login-container">
+            <h1>Login to your UOW Account</h1>
+            <div class="login-box">
+                <div class="row-form">
+                    <span class="info-field">Email :</span>
+                    <input class="login-input" title="email" type="text">
+                </div>
+                <div class="row-form">
+                    <span class="info-field">Password :</span>
+                    <input class="login-input" title="password" type="password">
+                </div>
+                <div class="row-form">
+                    <a href="">Not a student?</a>
+                </div>
+                <div class="row-form">
+                    <button onclick="login()">Login</button>
+                </div>
+                <div class="row-form">
+                    <a href="#" onclick="openRegister()">New user? Register here</a>
+                </div>
+                <div class="row-form" id="error"></div>
+            </div>
+        </div>
+        <div id="register-container">
+            <h1>Register for an Account</h1>
+            <div class="register-box">
+                <form>
+                    <div class="row-form">
+                        <span class="info-field">Student Name :</span>
+                        <input class="login-input" title="reg-name" type="text">
+                    </div>
+                    <div class="row-form">
+                        <span class="info-field">Email :</span>
+                        <input class="login-input" title="reg-email" type="text">
+                    </div>
+                    <div class="row-form">
+                        <span class="info-field">Password :</span>
+                        <input class="login-input" title="password" type="password" id="reg-pw">
+                    </div>
+                    <div class="row-form">
+                        <span class="info-field">Confirm PW :</span>
+                        <input class="login-input" title="password" type="password" id="reg-cfmpw">
+                    </div>
+                    <div class="row-form">
+                        <button onclick="register()">Register</button>
+                    </div>
+                    <div class="row-form" id="reg_error"></div>
+                </form>
             </div>
         </div>
         <script src="backend.js"></script>

@@ -3,6 +3,9 @@ body{
     font-family: Inter;
 
 }
+
+/* Nav */
+
 #sim-logo{
     display: inline;
     width: 120px;
@@ -43,25 +46,75 @@ body{
 .nav-btn:hover{
     color: blue;
 }
-.background-img{
-    width: auto;
-    height: 700px;
+.onlogin {
+    display: none;
 }
-.background-img-container{
-    display: flex;
-    justify-content: center;
-}
-.content{
-    display: flex;
+
+
+
+
+/* Booking */
+
+#booking-container{
+    display: none;
     justify-content: center;
     flex-direction: column;
     align-items: center;
 }
+.room{
+    width: 800px;
+    height: 10ch;
+    box-shadow: 0 6px 6px rgba(0, 0, 0, .1);
+    padding: 3ch;
+    margin: 3ch;
+    display: flex;
+}
 .building-container{
     width: 80%
 }
-.room-container{
-    width: 100%;
-    height: 10ch;
+
+/* Login */
+#login-container{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.login-box,.register-box{
+    width: 500px;
+    height: 300px;
     box-shadow: 0 6px 6px rgba(0, 0, 0, .1);
+    padding: 30px
+}
+.row-form{
+    display: flex;
+    column-gap: 10%;
+    justify-content: center;
+    padding: 2%;
+}
+.info-field{
+    width: 25%;
+}
+
+button {
+  background-color: #3f8fe6;
+  border: none;
+  color: #fff;
+  padding: 15px 30px;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+#error, #reg_error {
+    color: red;
+    font-size: small;
+}
+
+/* Register */
+#register-container{
+    display:none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
