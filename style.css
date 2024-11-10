@@ -75,7 +75,7 @@ body{
 .meeting-icon{
     padding: 0px 2px 2px 0px;
 }
-#room-info{
+.room-info{
     display: flex;
     width: 30%;
     flex-wrap: wrap;
@@ -95,10 +95,10 @@ body{
     align-items: center;
 }
 .slotbtn {
-    width: 19%;
+    width: 18%;
     background-color: rgb(206, 206, 206);
     border-radius: 12px;
-    padding: 12px 12px;
+    padding: 10px 12px;
     color: black;
     font-weight: 400;
     font-family: Inter;

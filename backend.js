@@ -280,7 +280,7 @@ function generateRooms() {
             const roomBuilding = document.createElement('span')
             const roomName = document.createElement('span')
 
-            roomNameContainer.id = "room-info"
+            roomNameContainer.classList.add("room-info")
             roomNameContainer.innerHTML = `<img class='meeting-icon' alt='room' src='resources/meeting_room.svg'></img>`
             roomBuilding.innerHTML = `${room.getBuilding()}`
             roomName.innerHTML = `Room No: ${room.getRoomname()}`
