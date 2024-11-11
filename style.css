@@ -141,6 +141,8 @@ button {
 #error, #reg_error {
     color: red;
     font-size: small;
+    width: 300px;
+    justify-self: center;
 }
 
 /* Register */

@@ -1,3 +1,35 @@
+class Calendar {
+    constructor(year) {
+        this.year = year;
+        this.dates = {}; // Stores booked timeslots by date in the format 'YYYY-MM-DD'
+    }
+
+    addBooking(date, timeslot, room) {
+        if (!this.dates[date]) {
+            this.dates[date] = {};
+        }
+        if (!this.dates[date][room]) {
+            this.dates[date][room] = [];
+        }
+
+        // Check if the timeslot is already booked
+        if (this.dates[date][room].includes(timeslot)) {
+            console.log(`Timeslot ${timeslot} on ${date} is already booked for ${room}`);
+            return false;
+        } else {
+            this.dates[date][room].push(timeslot);
+            console.log(`Booking successful: ${timeslot} on ${date} for ${room}`);
+            return true;
+        }
+    }
+
+    getAvailableTimeslots(date, room) {
+        const roomBookings = (this.dates[date] && this.dates[date][room]) || [];
+        const allTimeslots = room.getTimeslots();
+        return allTimeslots.filter(slot => !roomBookings.includes(slot));
+    }
+}
+
 class User {
     constructor(name, email, pw) {
       this.name = name
@@ -267,51 +299,61 @@ function onDisplayChange(mutationsList, observer) {
     }
 }
 
-function generateRooms() {
+function generateRooms(date) {
     const container = document.getElementById('room-container');
-    console.log('Generating rooms...'); // Debugging log
-    
-    // Ensure `rooms` is an array and properly structured
-    rooms.forEach((room) => {
-        // Make sure room.getLaunch is a boolean or a method that returns true/false
-        if (room.getLaunch() == true) {
-            const newDiv = document.createElement('div')
-            const roomNameContainer = document.createElement('div')
-            const roomBuilding = document.createElement('span')
-            const roomName = document.createElement('span')
+    container.innerHTML = ''; // Clear previous room data
 
-            roomNameContainer.classList.add("room-info")
-            roomNameContainer.innerHTML = `<img class='meeting-icon' alt='room' src='resources/meeting_room.svg'></img>`
-            roomBuilding.innerHTML = `${room.getBuilding()}`
-            roomName.innerHTML = `Room No: ${room.getRoomname()}`
-            roomName.setAttribute('style','font-size:small;')
+    rooms.forEach((room) => {
+        if (room.getLaunch() === true) {
+            const newDiv = document.createElement('div');
             newDiv.classList.add('room');
 
+            const roomNameContainer = document.createElement('div');
+            roomNameContainer.classList.add('room-info');
+            roomNameContainer.innerHTML = `<img class='meeting-icon' alt='room' src='resources/meeting_room.svg'></img>`;
+
+            const roomBuilding = document.createElement('span');
+            const roomName = document.createElement('span');
+            roomBuilding.innerHTML = `${room.getBuilding()}`;
+            roomName.innerHTML = `Room No: ${room.getRoomname()}`;
+            roomName.setAttribute('style', 'font-size:small;');
+
+            roomNameContainer.appendChild(roomBuilding);
+            roomNameContainer.appendChild(roomName);
+            newDiv.appendChild(roomNameContainer);
+
+            const newBtnContainer = document.createElement('div');
+            newBtnContainer.classList.add('button-container');
+            newDiv.appendChild(newBtnContainer);
+
+            // Get available slots for the room and date
+            const availableSlots = calendar.getAvailableTimeslots(date, room);
+            availableSlots.forEach((slot) => {
+                const btn = document.createElement('button');
+                btn.classList.add('slotbtn');
+                btn.innerHTML = slot;
+                btn.onclick = () => bookRoom(date, slot, room, student_acc); // Attach booking logic
+                newBtnContainer.appendChild(btn);
+            });
+
             container.appendChild(newDiv);
-            newDiv.appendChild(roomNameContainer)
-            roomNameContainer.appendChild(roomBuilding)
-            roomNameContainer.appendChild(roomName)
-
-            newBtncontainer = document.createElement('div')
-            newBtncontainer.classList.add('button-container')
-            newDiv.appendChild(newBtncontainer)
-            
-            timeslots = room.getTimeslots()
-
-            timeslots.forEach((slot) => {
-                btn = document.createElement('button')
-                btn.classList.add('slotbtn')
-                btn.innerHTML = slot
-                newBtncontainer.appendChild(btn)
-            })
-
-            
-
-
-
-
-        } else {
-            console.log('Room is not launched, skipping...');  // Debugging log
         }
     });
+}
+
+
+const calendar = new Calendar(2024);
+
+function bookRoom(date, timeslot, room, user) {
+    const booking = new Booking(room, user, timeslot);
+    if (calendar.addBooking(date, timeslot, room.getRoomname())) {
+        console.log(`Booking confirmed for ${user.getName()} on ${date} at ${timeslot} in ${room.getRoomname()}`);
+    } else {
+        console.log(`Failed to book ${timeslot} on ${date} for ${room.getRoomname()}`);
+    }
+}
+
+function handleDateChange(event) {
+    const selectedDate = event.target.value; // Get selected date as 'YYYY-MM-DD'
+    generateRooms(selectedDate);
 }
