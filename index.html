@@ -21,6 +21,7 @@
             <h1>Book a Room</h1>
             <p>Note that bookings are strictly for students that are in Campus. Please arrive at the room within 10 minutes or the room will be forfieted.</p>
             <input type="date" id="date-picker" onchange="handleDateChange(event)">
+            <div class="row-form" id="date_err"></div>
             <div id="room-container"></div>
         </div>
         <div id="login-container">
@@ -69,6 +70,9 @@
                     <div class="row-form" id="reg_error"></div>
                 </form>
             </div>
+        </div>
+        <div id="booking-cfm-container">
+
         </div>
         <script src="js/calendar.js"></script>
         <script src="js/room.js"></script>

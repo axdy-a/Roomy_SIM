@@ -96,7 +96,7 @@ body{
 }
 .slotbtn {
     width: 18%;
-    background-color: rgb(206, 206, 206);
+    background-color: rgb(46, 141, 230);
     border-radius: 12px;
     padding: 10px 12px;
     color: black;
@@ -138,7 +138,7 @@ button {
   cursor: pointer;
 }
 
-#error, #reg_error {
+#error, #reg_error, #date_err {
     color: red;
     font-size: small;
     width: 300px;

@@ -214,7 +214,9 @@ function generateRooms(date) {
                 const btn = document.createElement('button');
                 btn.classList.add('slotbtn');
                 btn.innerHTML = slot;
-                btn.onclick = () => bookRoom(date, slot, room, student_acc); // Attach booking logic
+                btn.onclick = function() {
+                    bookRoom(date, slot, room, student_acc, this);
+                };
                 newBtnContainer.appendChild(btn);
             });
 
@@ -224,16 +226,46 @@ function generateRooms(date) {
 }
 
 
-function bookRoom(date, timeslot, room, user) {
+function bookRoom(date, timeslot, room, user, element) {
     const booking = new Booking(room, user, timeslot);
-    if (calendar.addBooking(date, timeslot, room.getRoomname())) {
-        console.log(`Booking confirmed for ${user.getName()} on ${date} at ${timeslot} in ${room.getRoomname()}`);
-    } else {
-        console.log(`Failed to book ${timeslot} on ${date} for ${room.getRoomname()}`);
+    error = document.getElementById('date_err')
+    if (!date){
+        error.display = 'block'
+        error.innerHTML = 'Missing Date!'
+    }
+    else {
+        element.style.color = 'grey'
+        element.style.backgroundColor = 'lightgrey'
+        if (calendar.addBooking(date, timeslot, room.getRoomname())) {
+            console.log(`Booking confirmed for ${user.getName()} on ${date} at ${timeslot} in ${room.getRoomname()}`);
+        } else {
+            console.log(`Failed to book ${timeslot} on ${date} for ${room.getRoomname()}`);
+        }
     }
 }
 
+
+/* Testing */
 function handleDateChange(event) {
     const selectedDate = event.target.value; // Get selected date as 'YYYY-MM-DD'
     generateRooms(selectedDate);
 }
+
+
+// Hardcode some random timeslot bookings for 2024-11-14
+const hardcodedDate = '2024-11-14';
+
+// Randomly select some rooms and timeslots from your predefined data
+const hardcodedBookings = [
+    { roomIndex: 0, timeslot: "9:00 AM<br>10:00 AM" },  // Room A-L2-101 at 9:00 AM
+    { roomIndex: 2, timeslot: "10:00 AM<br>11:00 AM" }, // Room A-L2-103 at 10:00 AM
+    { roomIndex: 4, timeslot: "1:00 PM<br>2:00 PM" },   // Room B-L3-211 at 1:00 PM
+    { roomIndex: 6, timeslot: "2:00 PM<br>3:00 PM" },   // Room B-L3-213 at 2:00 PM
+    { roomIndex: 7, timeslot: "4:00 PM<br>5:00 PM" }    // Room B-L3-214 at 4:00 PM
+];
+
+// Loop through the hardcoded bookings and book the rooms
+hardcodedBookings.forEach(booking => {
+    const room = rooms[booking.roomIndex];  // Get the room based on the index
+    bookRoom(hardcodedDate, booking.timeslot, room, student_acc);  // Use student_acc for the user
+});
