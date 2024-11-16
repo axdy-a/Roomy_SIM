@@ -73,7 +73,8 @@
         </div>
         <div id="booking-cfm-container">
             <div class="popup-container">
-                <div class="popup-header">Room Booking Payment Information</div>
+                <button id="close-popup" onclick="openBooking()">&#10006;</button>
+                <div class="popup-header"><span><b>Room Booking Payment Information</b></span><br><span>Price is $2 per hour for all rooms</span><span id="room-info-payment"></span></div>
                 <input type="text" class="input-field" placeholder="Cardholder Name">
                 <input type="text" class="input-field" placeholder="Card Number">
                 <input type="text" class="input-field" placeholder="Expiry Date">
@@ -83,7 +84,7 @@
             </div>
         </div>
         <div id="cfmed-bookings">
-            <h2>Your Bookings</h2>
+            <p>Your Bookings</p>
         </div>
         <div class="staff-container">
             <h1 class="staff-page-title">Create a New Room</h1>

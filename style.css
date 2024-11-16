@@ -141,8 +141,9 @@ button {
 #error, #reg_error, #date_err {
     color: red;
     font-size: small;
-    width: 300px;
+    width: 100px;
     justify-self: center;
+    text-align: center;
 }
 
 /* Register */
@@ -152,7 +153,16 @@ button {
     justify-content: center;
     flex-direction: column;
 }
-
+.popup-header {
+    padding-bottom: 20px;
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.popup-header > span {
+    width: auto;
+    text-align: center;
+}
 .popup-container {
     display:flex;
     align-items: center;
@@ -166,6 +176,14 @@ button {
     width: 90%;
     max-width: 400px;
 
+}
+
+#close-popup {
+    margin-left: auto;
+    justify-self: right;
+    color: black;
+    background-color: white;
+    font-size: larger;
 }
 
 .input-field {
@@ -212,4 +230,9 @@ button {
 
 .staff-container {
     display: none;
+}
+.booked-room {
+    width: 400px;
+    box-shadow: 0 6px 6px rgba(0, 0, 0, .1);
+    padding: 20px;
 }

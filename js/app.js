@@ -40,11 +40,13 @@ const nav_offlogin = document.getElementsByClassName('offlogin')
 
 var current_account;
 let currentBooking = null;
+var btn_element;
 
 function openLogin(){
     login_section.style.display = 'flex'
     booking_section.style.display = 'none'
     reg_section.style.display = 'none'
+    cfmed_section.style.display = 'none'
     login_status = document.querySelector(".far-right")
     login_status.textContent = ""
 }
@@ -53,6 +55,7 @@ function openBooking(){
     login_section.style.display = 'none'
     reg_section.style.display = 'none'
     cfmed_section.style.display = 'none'
+    payment_section.style.display = 'none'
     booking_section.style.display = 'flex'
 
     Array.from(nav_onlogin).forEach((nav) => {
@@ -277,13 +280,9 @@ function bookRoom(date, timeslot, room, user, element = null) {
     if (calendar.addBooking(date, timeslot, room.getRoomname(), user)) {
         user.bookedRooms.push(booking); // Add booking to the user’s booked rooms
         currentBooking = booking; // Update currentBooking
+        btn_element = element;
         openPayment();
 
-        if (element) {
-            element.style.color = 'grey';
-            element.style.backgroundColor = 'lightgrey';
-            element.disabled = true;
-        }
     } else {
         error.style.display = 'block';
         error.innerHTML = 'Room is booked by another student!';
@@ -320,7 +319,6 @@ hardcodedBookings.forEach(booking => {
     const room = rooms[booking.roomIndex];  // Get the room based on the index
     calendar.addBooking(hardcodedDate, booking.timeslot, room.getRoomname());  // Mark as booked
 });
-
 
 document.querySelector('.submit-btn').addEventListener('click', function(event) {
     // Prevent the default form submission (if any)
@@ -361,6 +359,11 @@ document.querySelector('.submit-btn').addEventListener('click', function(event) 
     }
 
     // If all inputs are valid, run the next function
+    if (btn_element) {
+        btn_element.style.color = 'grey';
+        btn_element.style.backgroundColor = 'lightgrey';
+        btn_element.disabled = true;
+    }
     onPaymentSuccess(cardNumber, expiryDate, cvv, promoCode);
 });
 

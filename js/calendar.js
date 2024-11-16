@@ -29,7 +29,9 @@ class Calendar {
                 console.log('User object is not valid or does not have getbookedRooms method');
             }
     
-            console.log(`Booking successful: ${timeslot} on ${date} for ${roomName}`);
+            const displayRoom = document.querySelector('span[id="room-info-payment"]')
+            var timeslot_text = timeslot.trim().split("<br>")
+            displayRoom.innerHTML = `<br> Your Selected Room: <br> ${timeslot_text[0]} to ${timeslot_text[1]} <br> ${date} <br> ${roomName}`;
             return true;
         }
     }
