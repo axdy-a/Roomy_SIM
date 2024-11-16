@@ -22,7 +22,7 @@ const rooms = [
     new Room("B-L3-214", "SIM Campus - Block B", default_timeslots, 2, 8, true, ["10OFF"])
 ];
 
-const staff_acc = new Staff("John", "admin@uow.edu.au", "Staff!");
+const staff_acc = new Staff("John", "admin@uow.edu.au", "Staffuow!");
 const student_acc = new Student("Chris", "chris@uow.edu.au", "Uowstudent!");
 const account_list = [staff_acc, student_acc];
 
