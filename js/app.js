@@ -31,10 +31,12 @@ const calendar = new Calendar(2024);
 const reg_section = document.getElementById('register-container')
 const login_section = document.getElementById('login-container')
 const booking_section = document.getElementById('booking-container')
+const payment_section = document.getElementById('booking-cfm-container')
 
 
 const nav_onlogin = document.getElementsByClassName('onlogin')
 const nav_offlogin = document.getElementsByClassName('offlogin')
+
 
 function openLogin(){
     login_section.style.display = 'flex'
@@ -63,12 +65,13 @@ function openRegister(){
     login_section.style.display = 'none'
 }
 
-function openConfirmed(){
-    //
+function openPayment(){
+    payment_section.style.display = 'flex'
 }
 
-function openStaff(){
-    //
+function openConfirmed(){
+    payment_section.style.display = 'none'
+    booking_section.style.display = 'none'
 }
 
 function login(){
@@ -214,9 +217,18 @@ function generateRooms(date) {
                 const btn = document.createElement('button');
                 btn.classList.add('slotbtn');
                 btn.innerHTML = slot;
-                btn.onclick = function() {
-                    bookRoom(date, slot, room, student_acc, this);
-                };
+
+                // Check if the slot is already booked
+                if (calendar.isSlotBooked(date, slot, room.getRoomname())) {
+                    btn.style.color = 'grey';
+                    btn.style.backgroundColor = 'lightgrey';
+                    btn.disabled = true;
+                } else {
+                    btn.onclick = function() {
+                        bookRoom(date, slot, room, student_acc, this);
+                    };
+                }
+
                 newBtnContainer.appendChild(btn);
             });
 
@@ -226,23 +238,35 @@ function generateRooms(date) {
 }
 
 
-function bookRoom(date, timeslot, room, user, element) {
+
+function bookRoom(date, timeslot, room, user, element = null) {
     const booking = new Booking(room, user, timeslot);
-    error = document.getElementById('date_err')
-    if (!date){
-        error.display = 'block'
-        error.innerHTML = 'Missing Date!'
-    }
-    else {
-        element.style.color = 'grey'
-        element.style.backgroundColor = 'lightgrey'
+    const error = document.getElementById('date_err');
+    if (!date) {
+        error.display = 'block';
+        error.innerHTML = 'Missing Date!';
+    } else {
         if (calendar.addBooking(date, timeslot, room.getRoomname())) {
+            openPayment()
             console.log(`Booking confirmed for ${user.getName()} on ${date} at ${timeslot} in ${room.getRoomname()}`);
+            if (element) {
+                element.style.color = 'grey';
+                element.style.backgroundColor = 'lightgrey';
+                element.disabled = true;
+
+            }
+
         } else {
-            console.log(`Failed to book ${timeslot} on ${date} for ${room.getRoomname()}`);
+            error.display = 'block'
+            error.innerHTML = 'Room is booked by another student!'
         }
     }
 }
+
+Calendar.prototype.isSlotBooked = function(date, timeslot, roomName) {
+    return this.dates[date] && this.dates[date][roomName] && this.dates[date][roomName].includes(timeslot);
+};
+
 
 
 /* Testing */
@@ -252,10 +276,10 @@ function handleDateChange(event) {
 }
 
 
-// Hardcode some random timeslot bookings for 2024-11-14
-const hardcodedDate = '2024-11-14';
+// Hardcode some pre-existing bookings for 2024-11-20
+const hardcodedDate = '2024-11-20';
 
-// Randomly select some rooms and timeslots from your predefined data
+// Hardcoded bookings
 const hardcodedBookings = [
     { roomIndex: 0, timeslot: "9:00 AM<br>10:00 AM" },  // Room A-L2-101 at 9:00 AM
     { roomIndex: 2, timeslot: "10:00 AM<br>11:00 AM" }, // Room A-L2-103 at 10:00 AM
@@ -264,8 +288,66 @@ const hardcodedBookings = [
     { roomIndex: 7, timeslot: "4:00 PM<br>5:00 PM" }    // Room B-L3-214 at 4:00 PM
 ];
 
-// Loop through the hardcoded bookings and book the rooms
+// Manually mark these rooms as booked for the specified date
 hardcodedBookings.forEach(booking => {
     const room = rooms[booking.roomIndex];  // Get the room based on the index
-    bookRoom(hardcodedDate, booking.timeslot, room, student_acc);  // Use student_acc for the user
+    calendar.addBooking(hardcodedDate, booking.timeslot, room.getRoomname());  // Mark as booked
 });
+
+
+document.querySelector('.submit-btn').addEventListener('click', function(event) {
+    // Prevent the default form submission (if any)
+    event.preventDefault();
+
+    // Get input values
+    const cardNumber = document.querySelector('input[placeholder="Card Number"]').value.trim();
+    const expiryDate = document.querySelector('input[placeholder="Expiry Date"]').value.trim();
+    const cvv = document.querySelector('input[placeholder="CVV"]').value.trim();
+    const promoCode = document.querySelector('input[placeholder="Promo Code"]').value.trim();
+
+    // Validate the card number (basic validation)
+    const cardNumberRegex = /^[0-9]{16}$/;
+    const expiryDateRegex = /^(0[1-9]|1[0-2])\/(2[3-9]|[3-9][0-9])$/; // MM/YY format
+    const cvvRegex = /^[0-9]{3}$/; // CVV should be 3 digits
+
+    let errorMessage = '';
+    
+    // Check if card number is valid
+    if (!cardNumberRegex.test(cardNumber)) {
+        errorMessage += 'Invalid card number. It should be 16 digits.\n';
+    }
+    
+    // Check if expiry date is valid
+    if (!expiryDateRegex.test(expiryDate)) {
+        errorMessage += 'Invalid expiry date. Please use MM/YY format.\n';
+    }
+    
+    // Check if CVV is valid
+    if (!cvvRegex.test(cvv)) {
+        errorMessage += 'Invalid CVV. It should be 3 digits.\n';
+    }
+
+    // If there's an error, show it
+    if (errorMessage !== '') {
+        alert(errorMessage);
+        return;  // Stop the function here if there are errors
+    }
+
+    // If all inputs are valid, run the next function
+    onPaymentSuccess(cardNumber, expiryDate, cvv, promoCode);
+});
+
+// Function that runs when payment data is valid
+function onPaymentSuccess(cardNumber, expiryDate, cvv, promoCode) {
+    console.log('Payment Data:', {
+        cardNumber: cardNumber,
+        expiryDate: expiryDate,
+        cvv: cvv,
+        promoCode: promoCode
+    });
+    
+    // Proceed to next steps (e.g., process payment, redirect to confirmation page, etc.)
+    alert('Payment successful!');
+    // Example: open the confirmation screen or process the payment
+    openConfirmed();
+}

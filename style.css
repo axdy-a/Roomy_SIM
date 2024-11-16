@@ -152,3 +152,56 @@ button {
     justify-content: center;
     flex-direction: column;
 }
+
+.popup-container {
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 400px;
+
+}
+
+.input-field {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.submit-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.submit-btn:hover {
+    background-color: #0056b3;
+}
+
+#booking-cfm-container {
+    position: fixed; /* or absolute, if needed */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* semi-transparent background */
+    z-index: 9999; /* ensure it has a higher z-index than other elements */
+    display: flex; /* hide by default */
+    align-items: center;
+    justify-content: center;
+}
