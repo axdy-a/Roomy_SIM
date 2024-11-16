@@ -3,6 +3,7 @@ class User {
         this.name = name;
         this.email = email;
         this.password = pw;
+        this.bookedRooms = []; // New property to store bookings
     }
 
     getName() {
@@ -15,6 +16,10 @@ class User {
 
     getPassword() {
         return this.password;
+    }
+
+    getbookedRooms() {
+        return this.bookedRooms;
     }
 }
 

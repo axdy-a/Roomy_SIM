@@ -11,8 +11,8 @@
         <div id="nav">
             <ul class="nav-menu">
                 <li class="nav-item"><img id="sim-logo" src="resources/logo-secondary.png" alt="logo"></li>
-                <li class="nav-item onlogin"><a class="nav-btn" href=.booking-container>Book a Room</a></li>
-                <li class="nav-item onlogin"><a class="nav-btn" href="#bookings">Bookings</a></li>
+                <li class="nav-item onlogin"><a class="nav-btn" href="javascript:void(0);" onclick="openBooking()">Book a Room</a></li>
+                <li class="nav-item onlogin"><a class="nav-btn" href="javascript:void(0);" onclick="openConfirmed()">Bookings</a></li>
                 <li class="nav-item offlogin"><a class="nav-btn" href="index.html" onclick="openLogin()">Login</a></li>
                 <li class="nav-item onlogin"><a class="nav-btn" href="javascript:void(0);" onclick="openLogin()">Logout</a></li>
             </ul>
@@ -81,6 +81,9 @@
                 <input type="text" class="input-field" placeholder="Promo Code">
                 <button class="submit-btn">Pay Now</button>
             </div>
+        </div>
+        <div id="cfmed-bookings">
+
         </div>
         <script src="js/calendar.js"></script>
         <script src="js/room.js"></script>

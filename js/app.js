@@ -32,11 +32,13 @@ const reg_section = document.getElementById('register-container')
 const login_section = document.getElementById('login-container')
 const booking_section = document.getElementById('booking-container')
 const payment_section = document.getElementById('booking-cfm-container')
+const cfmed_section = document.getElementById('cfmed-bookings')
 
 
 const nav_onlogin = document.getElementsByClassName('onlogin')
 const nav_offlogin = document.getElementsByClassName('offlogin')
 
+var current_account;
 
 function openLogin(){
     login_section.style.display = 'flex'
@@ -49,6 +51,7 @@ function openLogin(){
 function openBooking(){
     login_section.style.display = 'none'
     reg_section.style.display = 'none'
+    cfmed_section.style.display = 'none'
     booking_section.style.display = 'flex'
 
     Array.from(nav_onlogin).forEach((nav) => {
@@ -72,6 +75,8 @@ function openPayment(){
 function openConfirmed(){
     payment_section.style.display = 'none'
     booking_section.style.display = 'none'
+    cfmed_section.style.display = "flex"
+    displayBookedRooms()
 }
 
 function login(){
@@ -108,6 +113,7 @@ function loginDisplay(acc){
         newLi.classList.add('far-right')
         newLi.textContent = `Logged in as ${acc.getName()}`
         container.appendChild(newLi)
+        current_account = acc
     } 
     else {
         element.textContent = `Logged in as ${acc.getName()}`
@@ -240,25 +246,26 @@ function generateRooms(date) {
 
 
 function bookRoom(date, timeslot, room, user, element = null) {
-    const booking = new Booking(room, user, timeslot);
+    const booking = new Booking(room, user, timeslot); // Create a booking instance (we don't need to push it again in this function)
     const error = document.getElementById('date_err');
+    
     if (!date) {
-        error.display = 'block';
+        error.style.display = 'block'; // Corrected error style
         error.innerHTML = 'Missing Date!';
     } else {
-        if (calendar.addBooking(date, timeslot, room.getRoomname())) {
-            openPayment()
-            console.log(`Booking confirmed for ${user.getName()} on ${date} at ${timeslot} in ${room.getRoomname()}`);
+        if (calendar.addBooking(date, timeslot, room.getRoomname(), user)) {
+            // Booking is successful, it's already added to the user's booked rooms in addBooking
+
+            openPayment();
+
             if (element) {
                 element.style.color = 'grey';
                 element.style.backgroundColor = 'lightgrey';
                 element.disabled = true;
-
             }
-
         } else {
-            error.display = 'block'
-            error.innerHTML = 'Room is booked by another student!'
+            error.style.display = 'block'; // Corrected error style
+            error.innerHTML = 'Room is booked by another student!';
         }
     }
 }
@@ -345,9 +352,50 @@ function onPaymentSuccess(cardNumber, expiryDate, cvv, promoCode) {
         cvv: cvv,
         promoCode: promoCode
     });
-    
-    // Proceed to next steps (e.g., process payment, redirect to confirmation page, etc.)
+
+    // Process the payment here (e.g., send to server, etc.)
+
+    // After successful payment, add the booking to the calendar and the user's booked rooms
+    // Here, you would ideally pass the current booking info
+
     alert('Payment successful!');
-    // Example: open the confirmation screen or process the payment
-    openConfirmed();
+    openConfirmed();  // Proceed to show the confirmation page
+}
+
+function displayBookedRooms() {
+    // Check if current_account exists and has booked rooms
+    if (!current_account || !current_account.getbookedRooms() || current_account.getbookedRooms().length === 0) {
+        document.getElementById("cfmed-bookings").innerHTML = "<p>No rooms booked yet.</p>";
+        return;
+    }
+
+    // Get the element where the booked rooms will be displayed
+    const bookingsContainer = document.getElementById("cfmed-bookings");
+
+    // Clear any existing content
+    bookingsContainer.innerHTML = "";
+
+    // Create a list or display for the booked rooms
+    current_account.bookedRooms.forEach((booking, index) => {
+        // Ensure the booking is an instance of the Booking class
+        if (!(booking instanceof Booking)) {
+            console.error(`Invalid booking entry at index ${index}`);
+            return;
+        }
+
+        // Create a div for each booking
+        const roomDiv = document.createElement("div");
+        roomDiv.className = "booked-room";
+        roomDiv.innerHTML = `
+            <h4>Booking ${index + 1}</h4>
+            <p>Room: ${booking.room.getRoomname()}</p>
+            <p>Building: ${booking.room.getBuilding()}</p>
+            <p>Date: ${booking.date || 'N/A'}</p>
+            <p>Time: ${booking.timeslot}</p>
+            <p>Price: $${booking.price.toFixed(2)}</p>
+        `;
+
+        // Append the room div to the container
+        bookingsContainer.appendChild(roomDiv);
+    });
 }
