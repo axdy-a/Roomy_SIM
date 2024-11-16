@@ -28,4 +28,15 @@ class Room {
     getBuilding() {
         return this.building;
     }
+    isPromoCodeValid(promoCode) {
+        return this.promo_codes.includes(promoCode);
+    }
+
+    getPrice(){
+        return this.price
+    }
+
+    setPrice(newPrice) {
+        this.price = newPrice;
+    }
 }

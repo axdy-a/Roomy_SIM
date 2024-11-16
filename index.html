@@ -83,7 +83,26 @@
             </div>
         </div>
         <div id="cfmed-bookings">
-
+            <h2>Your Bookings</h2>
+        </div>
+        <div class="staff-container">
+            <h1 class="staff-page-title">Create a New Room</h1>
+            <div class="staff-form-container">
+                <form id="create-room-form" class="staff-create-room-form">
+                    <label for="room-name" class="staff-form-label">Room Name:</label>
+                    <input type="text" id="room-name" name="room-name" class="staff-form-input" required>
+                    
+                    <label for="capacity" class="staff-form-label">Room Capacity:</label>
+                    <input type="number" id="capacity" name="capacity" class="staff-form-input" required>
+                    
+                    <label for="description" class="staff-form-label">Room Description:</label>
+                    <input type="text" id="description" name="description" class="staff-form-input" required>
+                    
+                    <button type="submit" class="staff-submit-btn">Create Room</button>
+                </form>
+            </div>
+    
+            <div id="error-message" class="staff-error-message"></div>
         </div>
         <script src="js/calendar.js"></script>
         <script src="js/room.js"></script>

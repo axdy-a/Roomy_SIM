@@ -1,17 +1,13 @@
 class Booking {
-    constructor(room, user, timeslot, promo_code = null) {
+    constructor(room, user, timeslot, date) {
         this.room = room;
         this.user = user;
         this.timeslot = timeslot;
-        this.promo_code = promo_code;
-        this.price = this.calculatePrice();
+        this.date = date;
+        this.price = room.getPrice(); // Set initial price from room
     }
 
-    calculatePrice() {
-        let price = this.room.price;
-        if (this.promo_code && this.room.promo_codes.includes(this.promo_code)) {
-            price *= 0.9; // Apply 10% discount if promo code is valid
-        }
-        return price;
+    setPrice(newPrice) {
+        this.price = newPrice; // Update the price in the booking
     }
 }

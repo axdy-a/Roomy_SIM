@@ -39,6 +39,7 @@ const nav_onlogin = document.getElementsByClassName('onlogin')
 const nav_offlogin = document.getElementsByClassName('offlogin')
 
 var current_account;
+let currentBooking = null;
 
 function openLogin(){
     login_section.style.display = 'flex'
@@ -246,27 +247,46 @@ function generateRooms(date) {
 
 
 function bookRoom(date, timeslot, room, user, element = null) {
-    const booking = new Booking(room, user, timeslot); // Create a booking instance (we don't need to push it again in this function)
     const error = document.getElementById('date_err');
-    
+
+    // Check if date is missing
     if (!date) {
-        error.style.display = 'block'; // Corrected error style
+        error.style.display = 'block';
         error.innerHTML = 'Missing Date!';
-    } else {
-        if (calendar.addBooking(date, timeslot, room.getRoomname(), user)) {
-            // Booking is successful, it's already added to the user's booked rooms in addBooking
+        return; // Don't proceed if the date is invalid
+    }
 
-            openPayment();
+    // Check if timeslot is missing
+    if (!timeslot) {
+        error.style.display = 'block';
+        error.innerHTML = 'Missing Timeslot!';
+        return;
+    }
 
-            if (element) {
-                element.style.color = 'grey';
-                element.style.backgroundColor = 'lightgrey';
-                element.disabled = true;
-            }
-        } else {
-            error.style.display = 'block'; // Corrected error style
-            error.innerHTML = 'Room is booked by another student!';
+    // Create booking instance
+    const booking = new Booking(room, user, timeslot, date);
+
+    // Check if this room is already booked for this date and timeslot
+    if (user.getbookedRooms().some(b => b.room === room && b.date === date && b.timeslot === timeslot)) {
+        error.style.display = 'block';
+        error.innerHTML = 'Room already booked for this date and timeslot!';
+        return; // Prevent booking if duplicate
+    }
+
+    // Check if the room is available for this date and timeslot
+    if (calendar.addBooking(date, timeslot, room.getRoomname(), user)) {
+        user.bookedRooms.push(booking); // Add booking to the user’s booked rooms
+        currentBooking = booking; // Update currentBooking
+        openPayment();
+
+        if (element) {
+            element.style.color = 'grey';
+            element.style.backgroundColor = 'lightgrey';
+            element.disabled = true;
         }
+    } else {
+        error.style.display = 'block';
+        error.innerHTML = 'Room is booked by another student!';
     }
 }
 
@@ -346,20 +366,45 @@ document.querySelector('.submit-btn').addEventListener('click', function(event) 
 
 // Function that runs when payment data is valid
 function onPaymentSuccess(cardNumber, expiryDate, cvv, promoCode) {
+    if (!currentBooking) {
+        alert('No booking found.');
+        return;
+    }
+
+    // Use currentBooking to get the room and apply the promo code
+    const selectedRoom = currentBooking.room; // The selected room for booking
+
+    // Check if the promo code is valid for the selected room
+    if (promoCode && !selectedRoom.isPromoCodeValid(promoCode)) {
+        alert('Invalid promo code for this room.');
+        return; // Stop if the promo code is invalid
+    }
+
+    // Apply discount if the promo code is valid
+    let discountAmount = 0;
+    if (promoCode && selectedRoom.isPromoCodeValid(promoCode)) {
+        // Assuming the promo code gives a 10% discount (can be changed as needed)
+        const discountRate = 0.10; // Example: 10% discount
+        discountAmount = selectedRoom.price * discountRate;
+        selectedRoom.price -= discountAmount;  // Apply the discount to the room price
+        alert(`Promo code applied! You saved $${discountAmount.toFixed(2)}.`);
+    }
+
+    // Display the final price after discount (if any)
+    console.log('Final Price after promo code:', selectedRoom.price.toFixed(2));
+
+    // Continue with the payment processing
     console.log('Payment Data:', {
         cardNumber: cardNumber,
         expiryDate: expiryDate,
         cvv: cvv,
-        promoCode: promoCode
+        promoCode: promoCode,
+        finalPrice: selectedRoom.price.toFixed(2) // Updated room price after discount
     });
 
-    // Process the payment here (e.g., send to server, etc.)
-
-    // After successful payment, add the booking to the calendar and the user's booked rooms
-    // Here, you would ideally pass the current booking info
-
+    // Proceed with payment...
     alert('Payment successful!');
-    openConfirmed();  // Proceed to show the confirmation page
+    openConfirmed();  // Show the confirmation page after payment
 }
 
 function displayBookedRooms() {
@@ -369,33 +414,41 @@ function displayBookedRooms() {
         return;
     }
 
-    // Get the element where the booked rooms will be displayed
     const bookingsContainer = document.getElementById("cfmed-bookings");
+    bookingsContainer.innerHTML = ""; // Clear any existing content
 
-    // Clear any existing content
-    bookingsContainer.innerHTML = "";
-
-    // Create a list or display for the booked rooms
-    current_account.bookedRooms.forEach((booking, index) => {
-        // Ensure the booking is an instance of the Booking class
-        if (!(booking instanceof Booking)) {
+    current_account.getbookedRooms().forEach((booking, index) => {
+        // Ensure the booking has a valid date and timeslot
+        if (!(booking instanceof Booking) || !booking.date || !booking.timeslot) {
             console.error(`Invalid booking entry at index ${index}`);
-            return;
+            return; // Skip invalid bookings
         }
 
-        // Create a div for each booking
         const roomDiv = document.createElement("div");
         roomDiv.className = "booked-room";
         roomDiv.innerHTML = `
-            <h4>Booking ${index + 1}</h4>
             <p>Room: ${booking.room.getRoomname()}</p>
             <p>Building: ${booking.room.getBuilding()}</p>
-            <p>Date: ${booking.date || 'N/A'}</p>
+            <p>Date: ${booking.date}</p>
             <p>Time: ${booking.timeslot}</p>
-            <p>Price: $${booking.price.toFixed(2)}</p>
         `;
 
-        // Append the room div to the container
         bookingsContainer.appendChild(roomDiv);
     });
+}
+
+function applyPromoCode() {
+    const promoCodeInput = document.querySelector('input[placeholder="Promo Code"]').value.trim();
+    const selectedRoom = currentBooking.room; // The selected room for booking
+
+    if (selectedRoom.isPromoCodeValid(promoCodeInput)) {
+        // Apply discount
+        const discountRate = 0.10; // Example: 10% discount
+        const discountAmount = selectedRoom.price * discountRate;
+        selectedRoom.price -= discountAmount;
+        alert(`Promo code applied! You saved $${discountAmount.toFixed(2)}.`);
+        console.log('Final Price after promo code:', selectedRoom.price.toFixed(2));
+    } else {
+        alert('Invalid promo code for this room.');
+    }
 }
