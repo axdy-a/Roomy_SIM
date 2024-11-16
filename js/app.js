@@ -41,6 +41,7 @@ const nav_offlogin = document.getElementsByClassName('offlogin')
 var current_account;
 let currentBooking = null;
 var btn_element;
+let currentDate = null;
 
 function openLogin(){
     login_section.style.display = 'flex'
@@ -173,7 +174,6 @@ function register(){
 // Options for the observer (observe the style attribute)
 const config = { attributes: true, attributeFilter: ['style'] };
 
-// Create a MutationObserver instance
 const observer = new MutationObserver(onDisplayChange);
 
 // Start observing the `booking_section`
@@ -182,13 +182,14 @@ observer.observe(booking_section, config);
 function onDisplayChange(mutationsList, observer) {
     for (let mutation of mutationsList) {
         if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-            // Log the current display value
             const displayValue = window.getComputedStyle(mutation.target).display;
             console.log('Observed display change:', displayValue);  // Debugging log
 
             if (displayValue === 'flex') {
-                console.log('Display is now flex! Generating rooms...'); // Debugging log
-                generateRooms();
+                console.log('Display is now flex! Generating rooms...');
+                if (currentDate) {
+                    generateRooms(currentDate);  // Generate rooms based on the currently selected date
+                }
             }
         }
     }
@@ -250,8 +251,13 @@ function generateRooms(date) {
 
 
 function bookRoom(date, timeslot, room, user, element = null) {
-    const error = document.getElementById('date_err');
+    if (currentBooking) {
+        console.log('Booking already in progress. Resetting currentBooking.');
+        currentBooking = null;
+    }
 
+    const error = document.getElementById('date_err');
+    console.log(date);
     // Check if date is missing
     if (!date) {
         error.style.display = 'block';
@@ -266,9 +272,6 @@ function bookRoom(date, timeslot, room, user, element = null) {
         return;
     }
 
-    // Create booking instance
-    const booking = new Booking(room, user, timeslot, date);
-
     // Check if this room is already booked for this date and timeslot
     if (user.getbookedRooms().some(b => b.room === room && b.date === date && b.timeslot === timeslot)) {
         error.style.display = 'block';
@@ -278,11 +281,11 @@ function bookRoom(date, timeslot, room, user, element = null) {
 
     // Check if the room is available for this date and timeslot
     if (calendar.addBooking(date, timeslot, room.getRoomname(), user)) {
-        user.bookedRooms.push(booking); // Add booking to the user’s booked rooms
-        currentBooking = booking; // Update currentBooking
-        btn_element = element;
-        openPayment();
-
+        // Create the booking instance but don't finalize it yet
+        currentBooking = new Booking(room, user, timeslot, date); // This sets currentBooking properly
+        console.log('Booking created:', currentBooking);
+        btn_element = element;  // Capture the button element for later use
+        openPayment();  // Proceed to payment section
     } else {
         error.style.display = 'block';
         error.innerHTML = 'Room is booked by another student!';
@@ -293,34 +296,27 @@ Calendar.prototype.isSlotBooked = function(date, timeslot, roomName) {
     return this.dates[date] && this.dates[date][roomName] && this.dates[date][roomName].includes(timeslot);
 };
 
+Calendar.prototype.removeBooking = function(date, timeslot, roomName) {
+    if (this.dates[date] && this.dates[date][roomName]) {
+        const index = this.dates[date][roomName].indexOf(timeslot);
+        if (index !== -1) {
+            this.dates[date][roomName].splice(index, 1);  // Remove the booking
+        }
+    }
+};
 
 
 /* Testing */
 function handleDateChange(event) {
     const selectedDate = event.target.value; // Get selected date as 'YYYY-MM-DD'
-    generateRooms(selectedDate);
+    currentDate = selectedDate;  // Store the selected date
+    generateRooms(selectedDate);  // Generate rooms based on the selected date
 }
 
 
-// Hardcode some pre-existing bookings for 2024-11-20
-const hardcodedDate = '2024-11-20';
 
-// Hardcoded bookings
-const hardcodedBookings = [
-    { roomIndex: 0, timeslot: "9:00 AM<br>10:00 AM" },  // Room A-L2-101 at 9:00 AM
-    { roomIndex: 2, timeslot: "10:00 AM<br>11:00 AM" }, // Room A-L2-103 at 10:00 AM
-    { roomIndex: 4, timeslot: "1:00 PM<br>2:00 PM" },   // Room B-L3-211 at 1:00 PM
-    { roomIndex: 6, timeslot: "2:00 PM<br>3:00 PM" },   // Room B-L3-213 at 2:00 PM
-    { roomIndex: 7, timeslot: "4:00 PM<br>5:00 PM" }    // Room B-L3-214 at 4:00 PM
-];
 
-// Manually mark these rooms as booked for the specified date
-hardcodedBookings.forEach(booking => {
-    const room = rooms[booking.roomIndex];  // Get the room based on the index
-    calendar.addBooking(hardcodedDate, booking.timeslot, room.getRoomname());  // Mark as booked
-});
-
-document.querySelector('.submit-btn').addEventListener('click', function(event) {
+document.querySelector('.submitpay-btn').addEventListener('click', function(event) {
     // Prevent the default form submission (if any)
     event.preventDefault();
 
@@ -374,7 +370,6 @@ function onPaymentSuccess(cardNumber, expiryDate, cvv, promoCode) {
         return;
     }
 
-    // Use currentBooking to get the room and apply the promo code
     const selectedRoom = currentBooking.room; // The selected room for booking
 
     // Check if the promo code is valid for the selected room
@@ -386,26 +381,26 @@ function onPaymentSuccess(cardNumber, expiryDate, cvv, promoCode) {
     // Apply discount if the promo code is valid
     let discountAmount = 0;
     if (promoCode && selectedRoom.isPromoCodeValid(promoCode)) {
-        // Assuming the promo code gives a 10% discount (can be changed as needed)
         const discountRate = 0.10; // Example: 10% discount
         discountAmount = selectedRoom.price * discountRate;
         selectedRoom.price -= discountAmount;  // Apply the discount to the room price
         alert(`Promo code applied! You saved $${discountAmount.toFixed(2)}.`);
     }
 
-    // Display the final price after discount (if any)
+    // Final price after discount (if any)
     console.log('Final Price after promo code:', selectedRoom.price.toFixed(2));
 
-    // Continue with the payment processing
+    // Proceed with payment...
     console.log('Payment Data:', {
         cardNumber: cardNumber,
         expiryDate: expiryDate,
         cvv: cvv,
         promoCode: promoCode,
-        finalPrice: selectedRoom.price.toFixed(2) // Updated room price after discount
+        finalPrice: selectedRoom.price.toFixed(2)
     });
 
-    // Proceed with payment...
+    // Now that payment is successful, add the booking to the user's booked rooms
+    currentBooking.user.bookedRooms.push(currentBooking); // Add to bookedRooms after payment
     alert('Payment successful!');
     openConfirmed();  // Show the confirmation page after payment
 }
@@ -421,9 +416,9 @@ function displayBookedRooms() {
     bookingsContainer.innerHTML = ""; // Clear any existing content
 
     current_account.getbookedRooms().forEach((booking, index) => {
-        // Ensure the booking has a valid date and timeslot
+        // Ensure the booking has a valid date, timeslot, and is an instance of Booking
         if (!(booking instanceof Booking) || !booking.date || !booking.timeslot) {
-            console.error(`Invalid booking entry at index ${index}`);
+            console.error(`Invalid booking entry at index ${index}`, booking);
             return; // Skip invalid bookings
         }
 
@@ -454,4 +449,31 @@ function applyPromoCode() {
     } else {
         alert('Invalid promo code for this room.');
     }
+}
+
+
+
+
+function cancelBooking() {
+    if (!currentBooking) {
+        alert('No booking to cancel.');
+        return;
+    }
+
+    const { room, date, timeslot } = currentBooking;
+    
+    // Remove booking from the calendar
+    calendar.removeBooking(date, timeslot, room.getRoomname());
+
+    // Reset the current booking
+    currentBooking = null;
+    
+    alert('Booking cancelled.');
+
+    // After cancellation, update the date (could be the current date or last selected date)
+    if (currentDate) {
+        generateRooms(currentDate);  // Re-render rooms based on the selected date
+    }
+
+    openBooking();  // Return to booking section
 }
