@@ -141,6 +141,34 @@
     
             <div id="error-message" class="staff-error-message"></div>
         </div>
+        <div id="modifyBookingPopup" class="popup">
+            <div class="popup-content">
+                <h2>Modify Booking</h2>
+                <form id="modifyBookingForm">
+                    <label for="newDate">Select New Date:</label>
+                    <input type="date" id="newDate">
+                    
+                    <label for="newTimeSlot">Select New Time Slot:</label>
+                    <select id="newTimeSlot">
+                        <option value="8:00 AM&lt;br&gt;9:00 AM">8:00 AM to 9:00 AM</option>
+                        <option value="9:00 AM&lt;br&gt;10:00 AM">9:00 AM to 10:00 AM</option>
+                        <option value="10:00 AM&lt;br&gt;11:00 AM">10:00 AM to 11:00 AM</option>
+                        <option value="11:00 AM&lt;br&gt;12:00 PM">11:00 AM to 12:00 AM</option>
+                        <option value="12:00 PM&lt;br&gt;1:00 PM">12:00 PM to 1:00 PM</option>
+                        <option value="1:00 PM&lt;br&gt;2:00 PM">1:00 PM to 2:00 PM</option>
+                        <option value="2:00 PM&lt;br&gt;3:00 PM">2:00 PM to 3:00 PM</option>
+                        <option value="3:00 PM&lt;br&gt;4:00 PM">3:00 PM to 4:00 PM</option>
+                        <option value="4:00 PM&lt;br&gt;5:00 PM">4:00 PM to 5:00 PM</option>
+                        <option value="5:00 PM&lt;br&gt;6:00 PM">5:00 PM to 6:00 PM</option>
+
+                        <!-- Add more options as needed -->
+                    </select>
+        
+                    <button type="button" onclick="saveModifiedBooking()">Save Changes</button>
+                    <button type="button" onclick="closeModifyPopup()">Cancel</button>
+                </form>
+            </div>
+        </div>
         <script src="js/calendar.js"></script>
         <script src="js/room.js"></script>
         <script src="js/user.js"></script>

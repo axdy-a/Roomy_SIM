@@ -438,17 +438,24 @@ function displayBookedRooms() {
 
     const bookingsContainer = document.getElementById("cfmed-bookings");
     bookingsContainer.innerHTML = ""; // Clear any existing content
-    var invalid; 
-    current_account.getbookedRooms().forEach((booking, index) => {
-        // Ensure the booking has a valid date, timeslot, and is an instance of Booking
+
+    // Filter out invalid bookings before processing
+    const validBookings = current_account.getbookedRooms().filter((booking, index) => {
         if (!(booking instanceof Booking) || !booking.date || !booking.timeslot) {
             console.error(`Invalid booking entry at index ${index}`, booking);
-            // Skip invalid bookings
-            invalid = index
-            return;
+            return false; // Exclude invalid booking from the result
         }
-        
-        timeslot_text = booking.timeslot.trim().split('<br>')
+        return true; // Keep valid bookings
+    });
+
+    if (validBookings.length === 0) {
+        document.getElementById("cfmed-bookings").innerHTML = "<p>No valid bookings found.</p>";
+        return;
+    }
+
+    // Iterate through the valid bookings
+    validBookings.forEach((booking, index) => {
+        const timeslot_text = booking.timeslot.trim().split('<br>');
         const roomDiv = document.createElement("div");
         roomDiv.className = "booked-room";
         roomDiv.innerHTML = `
@@ -461,12 +468,11 @@ function displayBookedRooms() {
                 <button class="cancelBooking" style="background-color:red" onclick="cancelCfmBooking(this)">Cancel</button>
             </div>
         `;
-        
+
         bookingsContainer.appendChild(roomDiv);
-        
     });
-    current_account.getbookedRooms().splice(invalid,1)
 }
+
 
 function cancelBooking() {
     if (!currentBooking) {
@@ -605,3 +611,78 @@ function cancelCfmBooking(element){
     displayBookedRooms()
 }
 
+function modifyBooking(buttonElement) {
+    // Get the current booking details
+    const roomName = buttonElement.parentElement.parentElement.querySelector('[id="cfmed-room-name"]').dataset.roomName;
+    const date = buttonElement.parentElement.parentElement.querySelector('[id="cfmed-date"]').dataset.date;
+    const timeslot = buttonElement.parentElement.parentElement.querySelector('[id="cfmed-slot"]').dataset.timeslot;
+
+    console.log('Modify Booking clicked:', { roomName, date, timeslot }); // Debugging log
+
+    // Pre-fill the form with current booking details
+    document.getElementById('newDate').value = date;
+
+    // Display the popup
+    document.getElementById('modifyBookingPopup').style.display = 'block';
+
+    // Store the current booking details globally for reference
+    currentBookingToModify = { roomName, date, timeslot };
+    console.log('Current booking to modify stored:', currentBookingToModify); // Debugging log
+}
+
+function saveModifiedBooking() {
+    const newDate = document.getElementById('newDate').value;
+    const newTimeSlot = document.getElementById('newTimeSlot').value;
+
+    console.log('New booking details:', { newDate, newTimeSlot }); // Debugging log
+
+    // Perform necessary validation checks
+    if (calendar.isSlotBooked(newDate, newTimeSlot, currentBookingToModify.roomName)) {
+        alert('The selected time slot is already booked for this room.');
+        console.log('Slot already booked for this room:', { newDate, newTimeSlot, currentBookingToModify });
+        return;
+    }
+
+    // Find the booking in the user's booked rooms
+    const bookingIndex = current_account.getbookedRooms().findIndex(b =>
+        b.room.getRoomname() === currentBookingToModify.roomName &&
+        b.date === currentBookingToModify.date &&
+        b.timeslot === currentBookingToModify.timeslot
+    );
+
+    console.log('Booking index found:', bookingIndex); // Debugging log
+
+    if (bookingIndex !== -1) {
+        // Create a new booking with modified details
+        const modifiedBooking = new Booking(
+            current_account.getbookedRooms()[bookingIndex].room, // Room from existing booking
+            current_account, // The user object
+            newTimeSlot, // New timeslot
+            newDate // New date
+        );
+
+        console.log('Modified booking:', modifiedBooking); // Debugging log
+
+        // Update the booking in the array
+        current_account.getbookedRooms()[bookingIndex] = modifiedBooking;
+
+        // Update the calendar with the modified booking
+        console.log('Removing old booking from calendar:', { date: currentBookingToModify.date, timeslot: currentBookingToModify.timeslot, roomName: currentBookingToModify.roomName });
+        calendar.removeBooking(currentBookingToModify.date, currentBookingToModify.timeslot, currentBookingToModify.roomName);
+
+        console.log('Adding modified booking to calendar:', { newDate, newTimeSlot, roomName: currentBookingToModify.roomName });
+        calendar.addBooking(newDate, newTimeSlot, currentBookingToModify.roomName, current_account);
+
+        alert('Booking modified successfully!');
+        displayBookedRooms(); // Refresh the displayed bookings
+        closeModifyPopup();
+    } else {
+        alert('Error: Booking not found.');
+        console.log('Booking not found in current account:', currentBookingToModify); // Debugging log
+    }
+}
+
+function closeModifyPopup() {
+    console.log('Closing modify booking popup'); // Debugging log
+    document.getElementById('modifyBookingPopup').style.display = 'none';
+}
