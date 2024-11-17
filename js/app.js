@@ -32,22 +32,30 @@ const reg_section = document.getElementById('register-container')
 const login_section = document.getElementById('login-container')
 const booking_section = document.getElementById('booking-container')
 const payment_section = document.getElementById('booking-cfm-container')
-const cfmed_section = document.getElementById('cfmed-bookings')
+const cfmed_section = document.getElementById('cfmed-container')
+const staff_section = document.getElementById('staff-container')
 
 
 const nav_onlogin = document.getElementsByClassName('onlogin')
 const nav_offlogin = document.getElementsByClassName('offlogin')
+const nav_onstaff = document.getElementsByClassName('onstaff')
 
 var current_account;
 let currentBooking = null;
 var btn_element;
 let currentDate = null;
 
+function openStaff(){
+    staff_section.style.display = 'flex'
+    login_section.style.display = 'none'
+}
+
 function openLogin(){
     login_section.style.display = 'flex'
     booking_section.style.display = 'none'
     reg_section.style.display = 'none'
     cfmed_section.style.display = 'none'
+    staff_section.style.display = 'none'
     login_status = document.querySelector(".far-right")
     login_status.textContent = ""
 }
@@ -101,6 +109,8 @@ function login(){
             /* Staff */
             status = 1
             console.log("staff")
+            loginDisplay(account_list[i])
+            openStaff()
         }
     }
     if (status == 0) {
@@ -211,7 +221,7 @@ function generateRooms(date) {
             const roomBuilding = document.createElement('span');
             const roomName = document.createElement('span');
             roomBuilding.innerHTML = `${room.getBuilding()}`;
-            roomName.innerHTML = `Room No: ${room.getRoomname()}`;
+            roomName.innerHTML = `Room No: ${room.getRoomname()}<br>Capacity: ${room.getCapacity()}<br>Price: $${room.getPrice()}`;
             roomName.setAttribute('style', 'font-size:small;');
 
             roomNameContainer.appendChild(roomBuilding);
@@ -285,6 +295,11 @@ function bookRoom(date, timeslot, room, user, element = null) {
         currentBooking = new Booking(room, user, timeslot, date); // This sets currentBooking properly
         console.log('Booking created:', currentBooking);
         btn_element = element;  // Capture the button element for later use
+
+        const displayRoom = document.querySelector('span[id="room-info-payment"]')
+        var timeslot_text = timeslot.trim().split("<br>")
+        displayRoom.innerHTML = `Your Selected Room: <br><br> ${timeslot_text[0]} to ${timeslot_text[1]} <br> on  ${date} <br> at ${room.getBuilding()}, ${room.getRoomname()} <br> Price: $${room.getPrice()}`;
+
         openPayment();  // Proceed to payment section
     } else {
         error.style.display = 'block';
@@ -297,6 +312,7 @@ Calendar.prototype.isSlotBooked = function(date, timeslot, roomName) {
 };
 
 Calendar.prototype.removeBooking = function(date, timeslot, roomName) {
+    console.log('hi')
     if (this.dates[date] && this.dates[date][roomName]) {
         const index = this.dates[date][roomName].indexOf(timeslot);
         if (index !== -1) {
@@ -421,14 +437,14 @@ function displayBookedRooms() {
             console.error(`Invalid booking entry at index ${index}`, booking);
             return; // Skip invalid bookings
         }
-
+        timeslot_text = booking.timeslot.trim().split('<br>')
         const roomDiv = document.createElement("div");
         roomDiv.className = "booked-room";
         roomDiv.innerHTML = `
             <p>Room: ${booking.room.getRoomname()}</p>
             <p>Building: ${booking.room.getBuilding()}</p>
             <p>Date: ${booking.date}</p>
-            <p>Time: ${booking.timeslot}</p>
+            <p>Time: ${timeslot_text[0]} to ${timeslot_text[1]}</p>
         `;
 
         bookingsContainer.appendChild(roomDiv);
@@ -476,4 +492,75 @@ function cancelBooking() {
     }
 
     openBooking();  // Return to booking section
+}
+
+function toggleDropdown() {
+    const dropdown = document.getElementById('dropdownList');
+    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+}
+let selected = [];
+function updateSelected() {
+    const checkboxes = document.querySelectorAll('#dropdownList input[type="checkbox"]');
+    const selected_text = [];
+    
+    checkboxes.forEach((checkbox) => {
+        const checkboxValue = checkbox.value;
+        const checkboxText = checkbox.parentElement.innerText.trim();
+        
+        if (checkbox.checked) {
+            // Add value to selected if checked
+            if (!selected.includes(checkboxValue)) {
+                selected.push(checkboxValue);
+            }
+            // Also update the text for display
+            selected_text.push(checkboxText);
+        } else {
+            // Remove value from selected if unchecked
+            const index = selected.indexOf(checkboxValue);
+            if (index !== -1) {
+                selected.splice(index, 1);  // Remove the unchecked value
+            }
+        }
+    });
+
+    // Update the display of selected options
+    document.getElementById('selectedOptions').innerHTML = selected_text.join('<br>');
+}
+
+// Close the dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const multiselectContainer = document.querySelector('.multiselect-container');
+    if (!multiselectContainer.contains(event.target)) {
+        document.getElementById('dropdownList').style.display = 'none';
+    }
+});
+
+// Create Room function
+function createRoom(event) {
+    event.preventDefault();  // Prevent form submission
+
+    // Get form field values
+    const roomName = document.getElementById('room-name').value;
+    const building = document.getElementById('building-name').value;
+    const capacity = document.getElementById('capacity').value;
+    const price = document.getElementById('room-price').value;
+    const promoCodesText = document.getElementById('promo-codes').value;
+
+    // Get the value of the Launch Status checkbox
+    const launchStatus = document.getElementById('launch-status').checked;  // This will be true or false
+
+    // Convert promo codes to an array (if any)
+    const promoCodes = promoCodesText ? promoCodesText.split(',').map(code => code.trim()) : [];
+
+    // Create a new room and add it to the global 'room' array
+    const newRoom = new Room(roomName, building, selected, price, capacity, launchStatus, promoCodes);
+    rooms.push(newRoom);
+
+    // Log the newly created room to the console
+    console.log(newRoom);  // This will log the room object to the browser console
+
+    // Optionally, clear the form after submission (if required)
+    document.getElementById('create-room-form').reset();
+    document.getElementById('selectedOptions').innerHTML = '';  // Clear the selected timeslots
+    alert("Room has been created!")
 }

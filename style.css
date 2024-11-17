@@ -3,7 +3,7 @@ body{
     font-family: Inter;
 }
 
-button {
+button, .dropdown-btn {
     background-color: #3f8fe6;
     border: none;
     color: #fff;
@@ -100,6 +100,10 @@ button {
     align-items: center;
     height: 80%;
 }
+.room-info span{
+    width: 170px;
+    text-align: center;
+}
 
 .building-container{
     width: 80%
@@ -140,7 +144,7 @@ button {
     padding: 30px
 }
 
-.row-form{
+.row-form, .row-form-staff{
     display: flex;
     column-gap: 10%;
     justify-content: center;
@@ -198,6 +202,7 @@ button {
     color: black;
     background-color: white;
     font-size: larger;
+    padding: 6px;
 }
 
 .input-field {
@@ -238,17 +243,83 @@ button {
     justify-content: center;
 }
 
-#cfmed-bookings {
+#cfmed-container {
     display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#cfmed-header {
+    padding: 20px;
 }
 
-
-/* Staff Page */
-.staff-container {
-    display: none;
+#cfmed-bookings {
+    display: flex;
+    flex-direction: column;
 }
 .booked-room {
-    width: 400px;
+    width: 700px;
     box-shadow: 0 6px 6px rgba(0, 0, 0, .1);
     padding: 20px;
+}
+
+/* Staff Page */
+#staff-container {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#create-room-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.staff-form-container {
+    width: 800px;
+}
+
+.staff-form-label {
+    width: 150px;
+}
+
+.row-form-staff {
+    width: 700px;
+}
+
+.multiselect-container {
+    position: relative;
+    display: inline-block;
+}
+.dropdown-btn {
+    padding: 10px;
+    width: 200px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    text-align: center;
+    font-size: small;
+}
+.dropdown-list {
+    display: none;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    position: absolute;
+    z-index: 1;
+    max-height: 150px;
+    overflow-y: auto;
+}
+.dropdown-list label {
+    display: block;
+    padding: 5px;
+    cursor: pointer;
+}
+.dropdown-list input {
+    margin-right: 5px;
+}
+#launch-status {
+    margin-left: 80px;
+    margin-right: 80px;
 }

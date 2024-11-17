@@ -25,6 +25,10 @@ class Room {
         return this.slots;
     }
 
+    getCapacity() {
+        return this.capacity;
+    }
+
     getBuilding() {
         return this.building;
     }
@@ -40,3 +44,4 @@ class Room {
         this.price = newPrice;
     }
 }
+
