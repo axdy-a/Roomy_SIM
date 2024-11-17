@@ -438,25 +438,34 @@ function displayBookedRooms() {
 
     const bookingsContainer = document.getElementById("cfmed-bookings");
     bookingsContainer.innerHTML = ""; // Clear any existing content
-
+    var invalid; 
     current_account.getbookedRooms().forEach((booking, index) => {
         // Ensure the booking has a valid date, timeslot, and is an instance of Booking
         if (!(booking instanceof Booking) || !booking.date || !booking.timeslot) {
             console.error(`Invalid booking entry at index ${index}`, booking);
-            return; // Skip invalid bookings
+            // Skip invalid bookings
+            invalid = index
+            return;
         }
+        
         timeslot_text = booking.timeslot.trim().split('<br>')
         const roomDiv = document.createElement("div");
         roomDiv.className = "booked-room";
         roomDiv.innerHTML = `
-            <p>Room: ${booking.room.getRoomname()}</p>
-            <p>Building: ${booking.room.getBuilding()}</p>
-            <p>Date: ${booking.date}</p>
-            <p>Time: ${timeslot_text[0]} to ${timeslot_text[1]}</p>
+            <p id="cfmed-room-name" data-room-name="${booking.room.getRoomname()}">Room: ${booking.room.getRoomname()}</p>
+            <p id="cfmed-building" data-building-name="${booking.room.getBuilding()}">Building: ${booking.room.getBuilding()}</p>
+            <p id="cfmed-date" data-date="${booking.date}">Date: ${booking.date}</p>
+            <p id="cfmed-slot" data-timeslot="${booking.timeslot}">Time: ${timeslot_text[0]} to ${timeslot_text[1]}</p>
+            <div style="display:flex;">
+                <button class="modifyBooking" onclick="modifyBooking()">Modify</button>
+                <button class="cancelBooking" style="background-color:red" onclick="cancelCfmBooking()">Cancel</button>
+            </div>
         `;
-
+        
         bookingsContainer.appendChild(roomDiv);
+        
     });
+    current_account.getbookedRooms().splice(invalid,1)
 }
 
 function cancelBooking() {
@@ -572,4 +581,24 @@ function logout() {
 
     // Open the login screen after logging out
     openLogin();
+}
+
+
+function cancelCfmBooking(){
+    cfmedRooms = currentBooking.user.bookedRooms
+    console.log(cfmedRooms)
+    room_name = document.getElementById("cfmed-room-name").dataset.roomName
+    building = document.getElementById("cfmed-building").dataset.buildingName
+    slot = document.getElementById("cfmed-slot").dataset.timeslot
+    date = document.getElementById("cfmed-date").dataset.date
+    cfmedRooms.forEach( (booking) => {
+        console.log(booking.room.getRoomname())
+        console.log(room_name)
+        if (booking.room.getRoomname() == room_name){
+            calendar.removeBooking(date, slot, room_name);
+            currentBooking.user.bookedRooms.pop(booking)
+        }
+
+    openConfirmed()
+    });
 }
