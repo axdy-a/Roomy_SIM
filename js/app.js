@@ -594,11 +594,11 @@ function cancelCfmBooking(){
     cfmedRooms.forEach( (booking) => {
         console.log(booking.room.getRoomname())
         console.log(room_name)
-        if (booking.room.getRoomname() == room_name){
+        if (booking.room.getRoomname() == room_name && booking.date == date){
             calendar.removeBooking(date, slot, room_name);
             currentBooking.user.bookedRooms.pop(booking)
         }
 
-    openConfirmed()
     });
+    displayBookedRooms()
 }
