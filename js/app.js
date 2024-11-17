@@ -48,6 +48,12 @@ let currentDate = null;
 function openStaff(){
     staff_section.style.display = 'flex'
     login_section.style.display = 'none'
+    Array.from(nav_onstaff).forEach((nav) => {
+        nav.style.display = 'inline'
+    })
+    Array.from(nav_offlogin).forEach((nav) => {
+        nav.style.display = 'none'
+    })
 }
 
 function openLogin(){
@@ -132,6 +138,7 @@ function loginDisplay(acc){
     } 
     else {
         element.textContent = `Logged in as ${acc.getName()}`
+        current_account = acc
     }
 }
 
@@ -425,6 +432,7 @@ function displayBookedRooms() {
     // Check if current_account exists and has booked rooms
     if (!current_account || !current_account.getbookedRooms() || current_account.getbookedRooms().length === 0) {
         document.getElementById("cfmed-bookings").innerHTML = "<p>No rooms booked yet.</p>";
+        console.log(current_account)
         return;
     }
 
@@ -450,25 +458,6 @@ function displayBookedRooms() {
         bookingsContainer.appendChild(roomDiv);
     });
 }
-
-function applyPromoCode() {
-    const promoCodeInput = document.querySelector('input[placeholder="Promo Code"]').value.trim();
-    const selectedRoom = currentBooking.room; // The selected room for booking
-
-    if (selectedRoom.isPromoCodeValid(promoCodeInput)) {
-        // Apply discount
-        const discountRate = 0.10; // Example: 10% discount
-        const discountAmount = selectedRoom.price * discountRate;
-        selectedRoom.price -= discountAmount;
-        alert(`Promo code applied! You saved $${discountAmount.toFixed(2)}.`);
-        console.log('Final Price after promo code:', selectedRoom.price.toFixed(2));
-    } else {
-        alert('Invalid promo code for this room.');
-    }
-}
-
-
-
 
 function cancelBooking() {
     if (!currentBooking) {
@@ -498,7 +487,9 @@ function toggleDropdown() {
     const dropdown = document.getElementById('dropdownList');
     dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
 }
+
 let selected = [];
+
 function updateSelected() {
     const checkboxes = document.querySelectorAll('#dropdownList input[type="checkbox"]');
     const selected_text = [];
@@ -542,8 +533,8 @@ function createRoom(event) {
     // Get form field values
     const roomName = document.getElementById('room-name').value;
     const building = document.getElementById('building-name').value;
-    const capacity = document.getElementById('capacity').value;
-    const price = document.getElementById('room-price').value;
+    const capacity = parseInt(document.getElementById('capacity').value);
+    const price = parseFloat(document.getElementById('room-price').value);
     const promoCodesText = document.getElementById('promo-codes').value;
 
     // Get the value of the Launch Status checkbox
@@ -563,4 +554,22 @@ function createRoom(event) {
     document.getElementById('create-room-form').reset();
     document.getElementById('selectedOptions').innerHTML = '';  // Clear the selected timeslots
     alert("Room has been created!")
+}
+
+function logout() {
+    // Reset the current account
+    current_account = null;
+
+    // Hide user-related sections
+    Array.from(nav_onlogin).forEach((nav) => {
+        nav.style.display = 'none';
+    });
+
+    // Show login and register sections
+    Array.from(nav_offlogin).forEach((nav) => {
+        nav.style.display = 'inline';
+    });
+
+    // Open the login screen after logging out
+    openLogin();
 }
