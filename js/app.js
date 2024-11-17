@@ -457,8 +457,8 @@ function displayBookedRooms() {
             <p id="cfmed-date" data-date="${booking.date}">Date: ${booking.date}</p>
             <p id="cfmed-slot" data-timeslot="${booking.timeslot}">Time: ${timeslot_text[0]} to ${timeslot_text[1]}</p>
             <div style="display:flex;">
-                <button class="modifyBooking" onclick="modifyBooking()">Modify</button>
-                <button class="cancelBooking" style="background-color:red" onclick="cancelCfmBooking()">Cancel</button>
+                <button class="modifyBooking" onclick="modifyBooking(this)">Modify</button>
+                <button class="cancelBooking" style="background-color:red" onclick="cancelCfmBooking(this)">Cancel</button>
             </div>
         `;
         
@@ -584,21 +584,24 @@ function logout() {
 }
 
 
-function cancelCfmBooking(){
+function cancelCfmBooking(element){
+    
     cfmedRooms = currentBooking.user.bookedRooms
     console.log(cfmedRooms)
-    room_name = document.getElementById("cfmed-room-name").dataset.roomName
-    building = document.getElementById("cfmed-building").dataset.buildingName
-    slot = document.getElementById("cfmed-slot").dataset.timeslot
-    date = document.getElementById("cfmed-date").dataset.date
-    cfmedRooms.forEach( (booking) => {
+    grandparent_element = element.parentElement.parentElement;
+    room_name = grandparent_element.querySelector("#cfmed-room-name").dataset.roomName
+    building = grandparent_element.querySelector("#cfmed-building").dataset.buildingName
+    slot = grandparent_element.querySelector("#cfmed-slot").dataset.timeslot
+    date = grandparent_element.querySelector("#cfmed-date").dataset.date
+    cfmedRooms.forEach( (booking,index) => {
         console.log(booking.room.getRoomname())
         console.log(room_name)
-        if (booking.room.getRoomname() == room_name && booking.date == date){
+        if (booking.room.getRoomname() == room_name && booking.date == date && booking.timeslot == slot){
             calendar.removeBooking(date, slot, room_name);
-            currentBooking.user.bookedRooms.pop(booking)
+            currentBooking.user.bookedRooms.splice(index,1)
         }
 
     });
     displayBookedRooms()
 }
+
